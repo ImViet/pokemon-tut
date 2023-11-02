@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import axios from "axios";
-import { ListPokemon, Pokemon } from "./interfaces";
+import { Detail, ListPokemon, Pokemon } from "./interfaces";
 import PokemonCollection from "./components/PokemonCollection";
 const App = () => {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [loadmore, setLoadmore] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
+  const [viewDetail, setViewDetail] = useState<Detail>({
+    id: 0,
+    isOpened: false,
+  });
 
+  //Run first time
   useEffect(() => {
     const getPokemon = async () => {
       const res = await axios.get(
@@ -25,6 +30,7 @@ const App = () => {
     getPokemon();
   }, []);
 
+  //Handle load more pokemon
   const nextPage = async () => {
     setLoading(true);
     let res = await axios.get(loadmore);
@@ -42,12 +48,18 @@ const App = () => {
     <div className="App">
       <div className="container">
         <div className="pokemon-header">Pokemon</div>
-        <PokemonCollection pokemons={pokemons} />
-        <div className="btn">
-          <button className="btn-loadmore" onClick={nextPage}>
-            {loading ? "Loading..." : "Load more"}
-          </button>
-        </div>
+        <PokemonCollection
+          pokemons={pokemons}
+          viewDetail={viewDetail}
+          setDetail={setViewDetail}
+        />
+        {!viewDetail.isOpened && (
+          <div className="btn">
+            <button className="btn-loadmore" onClick={nextPage}>
+              {loading ? "Loading..." : "Load more"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
